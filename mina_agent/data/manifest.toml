@@ -94,6 +94,15 @@ modes = ["opam", "nix"]
 # Measured 2026-09-03 for reference: currency ran 14 tests in 3 s warm.
 
 # ---------------------------------------------------------------------------
+# buildkite: where the read-only ci_* tools look. pipeline is the default
+# when a tool call names none: the scheduled nightlies of the mainline
+# branches (develop and compatible each get one build a night).
+# ---------------------------------------------------------------------------
+[buildkite]
+org = "o-1-labs-2"
+pipeline = "mina-mainline-branches-nightlies"
+
+# ---------------------------------------------------------------------------
 # profiles: Mina's build profiles (src/lib/node_config/profiled/*.ml). The
 # build, test and test_one tools take profile=<name> and export every var
 # below for that one run, the way buildkite/scripts/profile-dependent-tests.sh

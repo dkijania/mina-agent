@@ -68,6 +68,15 @@ does not say), then measures base and head with no instrumentation:
 bytes allocated, and samply for the share of samples under a named
 function. It reports whether the claimed numbers roughly recover.
 
+Triaging a nightly: `mina-agent run triage-nightly --branch <develop|compatible>`
+reads the newest finished build of the mainline nightly pipeline, sorts its
+failed jobs into hard and soft, new, persistent and intermittent against the
+previous builds, and finds each cause in the job logs and in the commits
+between the last green build and this one. It reads Buildkite through three
+read-only MCP tools (`ci_builds`, `ci_build`, `ci_job_log`), which need
+`BUILDKITE_API_TOKEN` (read scope only); git is limited to log, show, diff and
+fetch. Nothing is retried, edited or posted: the report is the output.
+
 Writing code: `mina-agent develop` is discuss's opposite. Edits are accepted
 without asking, tests may be run, and the shell is an allowlist enforced by
 a hook (git, gh, `mina-agent lint/list/status/doctor`, read-only utilities;

@@ -2,3 +2,4 @@
 # mina-agent sources it for every session it starts. Not needed when the
 # tools are already authenticated on this machine (`gh auth login`).
 export GH_TOKEN=ghp_...      # only where gh cannot use a keyring login (CI, a fresh box)
+export BUILDKITE_API_TOKEN=bkua_...  # triage-nightly and the ci_* tools; read_builds + read_build_logs scope is enough

@@ -917,12 +917,53 @@ def bug_report_file(title: str, body: str, bundle: str = "") -> dict:
     return B.file_issue(title, body, bundle or None)
 
 
+# --------------------------------------------------------------------------
+# CI (Buildkite, read-only)
+# --------------------------------------------------------------------------
+
+def _bk(pipeline: str) -> tuple[str, str]:
+    cfg = MANIFEST_DATA["buildkite"]
+    return cfg["org"], pipeline or cfg["pipeline"]
+
+
+def ci_builds(branch: str = "", pipeline: str = "", limit: int = 7) -> dict:
+    """Recent Buildkite builds, newest first, each with its failed jobs
+    (latest attempt; soft_failed marks a step allowed to fail). One call over
+    several builds shows whether a failure is new, persistent or
+    intermittent. pipeline defaults to manifest [buildkite] pipeline (the
+    scheduled nightlies of the mainline branches); branch filters, e.g.
+    develop or compatible."""
+    from . import buildkite as bk
+    org, pipe = _bk(pipeline)
+    return {"pipeline": pipe, "builds": bk.builds(org, pipe, branch, limit)}
+
+
+def ci_build(number: int, pipeline: str = "") -> dict:
+    """One build: commit, state, job-state counts, and every failed job
+    (latest attempt) with its job id, step_key, exit status and soft_failed.
+    Pass a job id to ci_job_log to read why it failed."""
+    from . import buildkite as bk
+    org, pipe = _bk(pipeline)
+    return {"pipeline": pipe} | bk.build(org, pipe, number)
+
+
+def ci_job_log(number: int, job: str, pipeline: str = "", tail_kib: int = 64, grep: str = "") -> dict:
+    """The end of one job's log (last tail_kib KiB, at most 4096), with
+    Buildkite timestamps and ANSI colour removed. size_bytes is the whole
+    log; truncated says the start was not fetched. With grep (a Python
+    regex), only matching lines of that window are returned, numbered."""
+    from . import buildkite as bk
+    org, pipe = _bk(pipeline)
+    return {"pipeline": pipe} | bk.job_log(org, pipe, number, job, tail_kib, grep)
+
+
 TOOLS = ["env_status", "build", "check", "check_dependents", "test", "test_one",
          "tests_for", "deps_of", "dependents_of", "library_of", "find_module", "usages",
          "type_at", "definition", "errors",
          "profile_status", "profile_run", "profile_top", "profile_callers", "profile_diff", "profile_add_library",
          "profile_link_impl",
-         "bug_report_bundle", "bug_report_file", "perf_measure", "perf_compare"]
+         "bug_report_bundle", "bug_report_file", "perf_measure", "perf_compare",
+         "ci_builds", "ci_build", "ci_job_log"]
 
 
 
